@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sonnerio</title>
+<meta name="description" content="Mude o tom e o andamento de qualquer música para ensaiar do seu jeito.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>document.documentElement.className = 'js';</script>
+<style>
+  :root {
+    --bg: #14123C;
+    --bg-dark: #0F0D2E;
+    --hero-1: #4C2E9E;
+    --hero-2: #241A72;
+    --indigo: #161049;
+    --text: #F4F2FF;
+    --text-2: #B9B3E0;
+    --text-3: #9690C4;
+    --mint: #5EEAD4;
+    --lavender: #A99BF0;
+    --coral: #FF7A6E;
+    --card-border: rgba(255,255,255,.08);
+    --card-bg: rgba(255,255,255,.04);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, .logo { font-family: 'Poppins', 'Inter', sans-serif; }
+  a { color: inherit; text-decoration: none; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--lavender); outline-offset: 3px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+
+  /* Nav */
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; padding-top: 18px; padding-bottom: 18px; }
+  .logo { font-size: 20px; font-weight: 700; }
+  .nav-links { display: flex; align-items: center; gap: 34px; font-size: 14.5px; color: var(--text-2); }
+  .nav-links a:hover { color: var(--text); }
+  .pill-light {
+    padding: 10px 22px; border-radius: 999px; background: #fff; color: var(--indigo);
+    font-weight: 600; font-size: 14.5px;
+  }
+  .nav-links a.pill-light, .nav-links a.pill-light:hover { color: var(--indigo); }
+
+  /* Hero */
+  .hero {
+    position: relative; text-align: center; padding: 90px 0 70px;
+    background: radial-gradient(800px 420px at 50% -10%, var(--hero-1), var(--hero-2) 55%, transparent 100%);
+  }
+  .eyebrow { font-size: 16px; color: var(--text-2); }
+  h1 { font-size: clamp(48px, 10vw, 96px); font-weight: 800; line-height: 1; letter-spacing: -0.02em; }
+  .tagline { font-size: clamp(17px, 2.2vw, 21px); color: var(--text-2); margin: 20px auto 34px; max-width: 640px; }
+  /* sublinhado ondulado, como se fosse feito à mão */
+  .squiggle {
+    color: var(--text);
+    padding-bottom: 6px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='6' viewBox='0 0 12 6'%3E%3Cpath d='M0 3 Q3 0 6 3 T12 3' fill='none' stroke='%235EEAD4' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x 0 100% / 12px 6px;
+  }
+  .cta { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+  .btn-primary {
+    padding: 15px 30px; border-radius: 999px; background: var(--mint); color: var(--indigo);
+    font-weight: 700; font-size: 15.5px; box-shadow: 0 8px 28px rgba(94,234,212,.28);
+  }
+  .btn-ghost {
+    padding: 15px 26px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,.22);
+    font-weight: 600; font-size: 15.5px;
+  }
+  .btn-primary:hover { filter: brightness(1.06); }
+  .btn-ghost:hover { border-color: rgba(255,255,255,.45); }
+  .wave {
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    height: 64px; max-width: 560px; margin: 52px auto 0; overflow: hidden;
+  }
+  .wave span {
+    width: 5px; border-radius: 3px; flex: none;
+    background: linear-gradient(to bottom, var(--mint), var(--lavender));
+    transform-origin: center; animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(.55); } }
+
+  /* Sections */
+  section { padding: 56px 0; }
+  h2 { font-size: clamp(28px, 4vw, 38px); font-weight: 700; text-align: center; margin-bottom: 12px; }
+  .section-sub { text-align: center; color: var(--text-2); max-width: 560px; margin: 0 auto 40px; }
+
+  /* Revelar ao rolar (só com JS; sem JS tudo aparece) */
+  .js .reveal { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
+  .js .reveal.in { opacity: 1; transform: none; }
+
+  /* Demo panel */
+  .demo {
+    border-radius: 28px; padding: 44px; border: 1px solid var(--card-border);
+    background: linear-gradient(155deg, rgba(94,234,212,.07), rgba(169,155,240,.05));
+    box-shadow: 0 30px 80px -34px rgba(94,234,212,.22);
+    display: grid; grid-template-columns: 1.05fr .95fr; gap: 46px; align-items: center;
+  }
+  .badge {
+    display: inline-block; font-size: 12.5px; font-weight: 600; color: var(--coral);
+    background: rgba(255,122,110,.14); padding: 5px 12px; border-radius: 999px; margin-bottom: 18px;
+    transform: rotate(-1.5deg);
+  }
+  .upload {
+    width: 100%; border: 1.5px dashed rgba(255,255,255,.22); border-radius: 18px; padding: 40px 24px;
+    background: transparent; color: inherit; font: inherit; text-align: center; cursor: pointer;
+  }
+  .upload:hover, .upload:focus-visible { border-color: var(--mint); }
+  .upload .icon {
+    width: 56px; height: 56px; border-radius: 50%; background: rgba(94,234,212,.14);
+    display: grid; place-items: center; margin: 0 auto 16px; color: var(--mint);
+  }
+  .upload strong { display: block; font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; }
+  .upload small { display: block; font-size: 13.5px; color: var(--text-3); margin-top: 6px; }
+  .hint { min-height: 22px; margin-top: 14px; font-size: 13.5px; color: var(--mint); text-align: center; }
+  .controls { display: grid; gap: 26px; }
+  .ctrl-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; margin-bottom: 12px; }
+  .ctrl-head .val { font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--mint); }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 20px; background: transparent; cursor: pointer; }
+  input[type=range]::-webkit-slider-runnable-track { height: 6px; border-radius: 4px; background: rgba(255,255,255,.12); }
+  input[type=range]::-moz-range-track { height: 6px; border-radius: 4px; background: rgba(255,255,255,.12); }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; margin-top: -7px;
+    background: var(--mint); border: 3px solid var(--bg); box-shadow: 0 0 0 2px var(--mint);
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 14px; height: 14px; border-radius: 50%; background: var(--mint);
+    border: 3px solid var(--bg); box-shadow: 0 0 0 2px var(--mint);
+  }
+  input[type=range]:focus-visible { outline: 2px solid var(--lavender); outline-offset: 4px; border-radius: 6px; }
+  .toggle { display: flex; padding: 5px; border-radius: 12px; background: rgba(255,255,255,.07); gap: 4px; }
+  .toggle button {
+    flex: 1; border: 0; border-radius: 8px; padding: 9px 6px; background: transparent; color: var(--text-2);
+    font: 600 13.5px 'Inter', sans-serif; cursor: pointer;
+  }
+  .toggle button[aria-pressed=true] { background: var(--mint); color: var(--indigo); }
+
+  /* Teclado de piano (2 oitavas): a tecla acesa acompanha o slider de tom */
+  .piano { position: relative; display: flex; height: 52px; margin-top: 14px; }
+  .piano .k { position: relative; box-sizing: border-box; }
+  .piano .k { cursor: pointer; transition: background .18s ease, transform .18s ease, box-shadow .18s ease; }
+  .piano .white {
+    flex: 1; background: rgba(255,255,255,.14); border: 1px solid rgba(20,18,60,.9);
+    border-radius: 0 0 5px 5px;
+  }
+  .piano .black {
+    position: absolute; top: 0; height: 60%; z-index: 1; border-radius: 0 0 4px 4px;
+    background: var(--bg-dark); border: 1px solid rgba(255,255,255,.12);
+  }
+  /* passar o mouse: verde acinzentado, a tecla sobe um pouquinho; clicar: verde de selecionada */
+  .piano .white:not(.on):hover { background: rgba(94,234,212,.38); transform: translateY(-2px); box-shadow: 0 6px 14px -6px rgba(94,234,212,.5); }
+  .piano .black:not(.on):hover { background: #2c5a5c; transform: translateY(-2px); box-shadow: 0 6px 14px -6px rgba(94,234,212,.5); }
+  .piano .on { background: var(--mint); }
+  .piano .origin::after {
+    content: ''; position: absolute; left: 50%; bottom: 5px; width: 6px; height: 6px; margin-left: -3px;
+    border-radius: 50%; background: var(--lavender);
+  }
+  .piano .black.origin::after { bottom: 5px; }
+  .piano-legend { font-size: 12.5px; color: var(--text-3); margin-top: 8px; display: flex; align-items: center; gap: 6px; }
+  .piano-legend i { width: 6px; height: 6px; border-radius: 50%; background: var(--lavender); display: inline-block; }
+
+  /* Player de exemplo */
+  .player {
+    grid-column: 1 / -1; display: flex; align-items: center; gap: 16px;
+    padding: 16px 18px; border-radius: 18px; background: rgba(15,13,46,.55); border: 1px solid var(--card-border);
+  }
+  .play {
+    flex: none; width: 46px; height: 46px; border-radius: 50%; border: 0; cursor: pointer;
+    background: var(--mint); color: var(--indigo); display: grid; place-items: center;
+  }
+  .play:hover { filter: brightness(1.06); }
+  .play svg { width: 20px; height: 20px; }
+  .play .i-pause { display: none; }
+  .play.playing .i-play { display: none; }
+  .play.playing .i-pause { display: block; }
+  .track { position: relative; flex: 1; min-width: 0; height: 56px; display: flex; align-items: center; gap: 2px; cursor: pointer; }
+  .track .bar { flex: 1; min-width: 1px; border-radius: 2px; background: rgba(255,255,255,.2); }
+  .track .bar.done { background: var(--mint); }
+  .loop-zone {
+    position: absolute; top: 0; bottom: 0; background: rgba(169,155,240,.18);
+    border-left: 2px solid var(--lavender); border-right: 2px solid var(--lavender); border-radius: 4px;
+    display: none; pointer-events: none;
+  }
+  .track.looping .loop-zone { display: block; }
+  /* alças A e B: arraste para mudar o tamanho do loop */
+  .loop-handle {
+    position: absolute; top: -6px; bottom: -6px; width: 18px; cursor: ew-resize; pointer-events: auto; touch-action: none;
+  }
+  .loop-handle.a { left: -10px; }
+  .loop-handle.b { right: -10px; }
+  .loop-handle::before {
+    content: ''; position: absolute; top: 4px; bottom: 4px; left: 7px; width: 4px; border-radius: 2px;
+    background: var(--lavender); transition: transform .15s ease, background .15s ease;
+  }
+  .loop-handle::after {
+    content: attr(data-l); position: absolute; top: -13px; left: 0; right: 0; text-align: center;
+    font: 700 11px 'Inter', sans-serif; color: var(--lavender);
+  }
+  .loop-handle:hover::before, .loop-handle:focus-visible::before { transform: scaleX(1.8); background: #fff; }
+  .loop-handle:focus-visible { outline: none; }
+  .time { flex: none; font: 600 13px 'Inter', sans-serif; color: var(--text-2); min-width: 78px; text-align: right; font-variant-numeric: tabular-nums; }
+  .loop-btn {
+    flex: none; border: 1.5px solid rgba(255,255,255,.22); background: transparent; color: var(--text-2);
+    border-radius: 999px; padding: 8px 14px; font: 600 13px 'Inter', sans-serif; cursor: pointer;
+  }
+  .loop-btn[aria-pressed=true] { border-color: var(--lavender); color: var(--lavender); background: rgba(169,155,240,.14); }
+
+  /* Features */
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-items: start; }
+  .card { border-radius: 20px; padding: 30px 26px; border: 1px solid var(--card-border); background: var(--card-bg); }
+  .grid3 .card:nth-child(2) { margin-top: 26px; }
+  .card .ico {
+    width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 18px;
+  }
+  .card h3 { font-size: 17.5px; font-weight: 600; margin-bottom: 8px; }
+  .card p { font-size: 14px; color: var(--text-3); line-height: 1.6; }
+  .c-mint { background: rgba(94,234,212,.14); color: var(--mint); box-shadow: 0 0 22px rgba(94,234,212,.16); }
+  .c-lav { background: rgba(169,155,240,.16); color: var(--lavender); box-shadow: 0 0 22px rgba(169,155,240,.16); }
+  .c-coral { background: rgba(255,122,110,.14); color: var(--coral); box-shadow: 0 0 22px rgba(255,122,110,.14); }
+  .soon { font-size: 11.5px; font-weight: 600; color: var(--coral); margin-left: 8px; vertical-align: middle; }
+
+  /* How it works */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
+  .step { position: relative; }
+  .step .num {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--mint); color: var(--indigo);
+    display: grid; place-items: center; font: 800 15px 'Poppins', sans-serif; margin-bottom: 14px;
+  }
+  .step:not(:last-child)::after {
+    content: ''; position: absolute; top: 17px; left: 46px; right: -24px;
+    border-top: 1.5px dashed rgba(94,234,212,.4);
+  }
+  .step h3 { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+  .step p { font-size: 14px; color: var(--text-3); }
+
+  /* Coming soon + footer */
+  .soon-box { text-align: center; }
+  footer { border-top: 1px solid rgba(255,255,255,.07); padding: 34px 0; margin-top: 30px; }
+  footer .wrap { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13.5px; color: var(--text-3); }
+
+  /* Interações ao passar o mouse */
+  .btn-primary, .btn-ghost { transition: transform .2s ease, filter .2s ease, border-color .2s ease; }
+  .btn-primary:hover, .btn-ghost:hover { transform: translateY(-2px); }
+  .nav-links a:not(.pill-light) { position: relative; }
+  .nav-links a:not(.pill-light)::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px; background: var(--mint);
+    transform: scaleX(0); transform-origin: left; transition: transform .25s ease;
+  }
+  .nav-links a:not(.pill-light):hover::after { transform: scaleX(1); }
+  .upload .icon { transition: transform .25s ease, background .25s ease; }
+  .upload:hover .icon { transform: translateY(-4px); background: rgba(94,234,212,.24); }
+  .toggle button { transition: background .2s ease, color .2s ease; }
+  .toggle button[aria-pressed=false]:hover { background: rgba(255,255,255,.08); color: var(--text); }
+
+  .grid3 .card:nth-child(1) { --acc: 94,234,212; }
+  .grid3 .card:nth-child(2) { --acc: 169,155,240; }
+  .grid3 .card:nth-child(3) { --acc: 255,122,110; }
+  .js .card.reveal { transition: opacity .6s ease, transform .25s ease, border-color .25s ease, background .25s ease, box-shadow .25s ease; }
+  .card:hover { border-color: rgba(var(--acc), .55); background: rgba(var(--acc), .07); box-shadow: 0 18px 40px -20px rgba(var(--acc), .55); }
+  .js .card.reveal.in:hover { transform: translateY(-6px); }
+  .card .ico { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
+  .card:hover .ico { transform: scale(1.12) rotate(-6deg); }
+
+  .step .num { transition: transform .25s ease, box-shadow .25s ease; }
+  .step h3 { transition: color .2s ease; }
+  .step:hover .num { transform: scale(1.14); box-shadow: 0 0 0 7px rgba(94,234,212,.16); }
+  .step:hover h3 { color: var(--mint); }
+  /* a linha entre os passos se desenha quando o passo aparece */
+  .js .step:not(:last-child)::after { transform: scaleX(0); transform-origin: left; transition: transform .9s ease .3s; }
+  .js .step.in:not(:last-child)::after { transform: scaleX(1); }
+
+  @media (max-width: 860px) {
+    .demo { grid-template-columns: 1fr; gap: 30px; }
+    .grid3, .steps { grid-template-columns: 1fr; }
+    .grid3 .card:nth-child(2) { margin-top: 0; }
+    .step:not(:last-child)::after { display: none; }
+    .steps { gap: 30px; }
+  }
+  @media (max-width: 640px) {
+    .wrap { padding: 0 20px; }
+    .nav-links a:not(.pill-light) { display: none; }
+    .hero { padding-top: 60px; }
+    .demo { padding: 30px 24px; }
+    .player { flex-wrap: wrap; }
+    .track { order: 3; flex-basis: 100%; }
+    .time { margin-left: auto; }
+    footer .wrap { flex-direction: column; align-items: flex-start; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wave span { animation: none; }
+    .js .reveal { opacity: 1; transform: none; transition: none; }
+    .js .step:not(:last-child)::after { transform: none; transition: none; }
+    .btn-primary:hover, .btn-ghost:hover, .js .card.reveal.in:hover, .card:hover .ico,
+    .step:hover .num, .upload:hover .icon, .piano .k:hover { transform: none; }
+    .card .ico, .piano .k, .step .num, .upload .icon { transition: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="#" class="logo">Sonnerio</a>
+    <div class="nav-links">
+      <a href="#recursos">Recursos</a>
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#demo">Demonstração</a>
+      <!-- Quando o app existir de verdade, este botão volta a ser "Entrar" (conta opcional para guardar músicas). -->
+      <a href="#em-breve" class="pill-light">Avise-me</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">bem-vindo ao</p>
+    <h1>Sonnerio</h1>
+    <p class="tagline">A música no seu tom, no seu ritmo, <span class="squiggle">do seu jeito</span>.</p>
+    <div class="cta">
+      <a href="#demo" class="btn-primary">Ver como funciona</a>
+      <a href="#recursos" class="btn-ghost">Conhecer os recursos</a>
+    </div>
+    <div class="wave" id="wave" aria-hidden="true"></div>
+  </div>
+</header>
+
+<main>
+  <section id="demo">
+    <div class="wrap">
+      <h2>Adapte como quiser</h2>
+      <p class="section-sub">Uma prévia de como o Sonnerio vai funcionar. Por enquanto os controles só mostram o resultado; o áudio ainda não é processado.</p>
+      <div class="demo reveal">
+        <div>
+          <span class="badge">Demonstração · em breve</span>
+          <button class="upload" id="upload" type="button">
+            <span class="icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M12 4l-5 5M12 4l5 5M4 20h16"/></svg>
+            </span>
+            <strong>Faça o upload da sua música</strong>
+            <small>MP3, WAV ou M4A. Seu arquivo fica no seu computador.</small>
+          </button>
+          <p class="hint" id="hint" role="status"></p>
+        </div>
+        <div class="controls">
+          <div>
+            <div class="ctrl-head"><label for="tom">Tom</label><span class="val" id="tomVal"></span></div>
+            <input type="range" id="tom" min="-12" max="12" step="1" value="0">
+            <div class="piano" id="piano" aria-hidden="true"></div>
+            <p class="piano-legend"><i></i> <span id="legendaTom">tom original</span></p>
+          </div>
+          <div>
+            <div class="ctrl-head"><label for="ritmo">Andamento</label><span class="val" id="ritmoVal"></span></div>
+            <input type="range" id="ritmo" min="50" max="150" step="5" value="100">
+          </div>
+          <div>
+            <div class="ctrl-head"><span>Faixas</span></div>
+            <div class="toggle" role="group" aria-label="Faixas">
+              <button type="button" aria-pressed="true">Original</button>
+              <button type="button" aria-pressed="false">Instrumental</button>
+              <button type="button" aria-pressed="false">Voz</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="player" aria-label="Player de exemplo">
+          <button class="play" id="play" type="button" aria-label="Tocar exemplo">
+            <svg class="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="i-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>
+          </button>
+          <div class="track" id="track">
+            <div class="loop-zone" id="loopZone">
+              <div class="loop-handle a" id="handleA" data-l="A" tabindex="0" role="slider" aria-label="Início do loop" aria-valuemin="0" aria-valuemax="100"></div>
+              <div class="loop-handle b" id="handleB" data-l="B" tabindex="0" role="slider" aria-label="Fim do loop" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+          <span class="time" id="time">0:00 / 0:30</span>
+          <button class="loop-btn" id="loopBtn" type="button" aria-pressed="false">Loop A–B</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="recursos">
+    <div class="wrap">
+      <h2>Pensado para você, músico</h2>
+      <p class="section-sub">Manipule a música da maneira que preferir, utilizando as ferramentas que quiser, quantas vezes quiser.</p>
+      <div class="grid3">
+        <article class="card reveal">
+          <div class="ico c-mint"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+          <h3>Altere o tom</h3>
+          <p>De um semitom até uma oitava acima ou abaixo do tom original, para encaixar na sua voz, no seu instrumento ou até no seu som.</p>
+        </article>
+        <article class="card reveal">
+          <div class="ico c-lav"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <h3>Ajuste o andamento</h3>
+          <p>Desacelere para aprender um trecho difícil ou acelere para testar suas habilidades.</p>
+        </article>
+        <article class="card reveal">
+          <div class="ico c-coral"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
+          <h3>Separe vozes e instrumentos <span class="soon">em breve</span></h3>
+          <p>Escute apenas o que quiser, seja apenas os instrumentos ou apenas alguns, e até somente uma voz, algumas ou todas as vozes.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="como-funciona">
+    <div class="wrap">
+      <h2>Como funciona</h2>
+      <div class="steps" style="margin-top:40px">
+        <div class="step reveal"><div class="num">1</div><h3>Traga sua música</h3><p>Escolha um arquivo do seu computador. Ele não sai do seu navegador.</p></div>
+        <div class="step reveal"><div class="num">2</div><h3>Ajuste do seu jeito</h3><p>Mude o tom, o andamento e as faixas até ficar confortável.</p></div>
+        <div class="step reveal"><div class="num">3</div><h3>Ensaie</h3><p>Toque, repita um trecho em loop e baixe o resultado para levar com você.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="em-breve">
+    <div class="wrap soon-box">
+      <h2>Em construção</h2>
+      <p class="section-sub">O Sonnerio ainda está em fase de elaboração. Em breve a página estará com todas as suas funções integradas e pronta para o uso.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="logo">Sonnerio</span>
+    <span>Pensado para quem faz música do seu jeito</span>
+  </div>
+</footer>
+
+<script>
+  // Números "aleatórios" que sempre dão o mesmo resultado, para a onda ter cara de música de verdade
+  function semente(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  // Onda decorativa do topo
+  (function () {
+    var wave = document.getElementById('wave');
+    var rnd = semente(7);
+    for (var i = 0; i < 54; i++) {
+      var s = document.createElement('span');
+      var envelope = 0.45 + 0.55 * Math.abs(Math.sin(i * 0.19 + 0.6));
+      s.style.height = (10 + rnd() * 48 * envelope) + 'px';
+      s.style.animationDelay = (rnd() * 1.4) + 's';
+      wave.appendChild(s);
+    }
+  })();
+
+  // Prévia dos controles (não processa áudio)
+  (function () {
+    // No app de verdade, o tom original vem da análise da música enviada e a nota nova
+    // (ex.: "Sol → Lá") é calculada a partir dele. Na vitrine só mostramos os semitons.
+    var tom = document.getElementById('tom');
+    var ritmo = document.getElementById('ritmo');
+    var tomVal = document.getElementById('tomVal');
+    var ritmoVal = document.getElementById('ritmoVal');
+
+    // Piano de 2 oitavas (25 teclas); a do meio é o tom original
+    var piano = document.getElementById('piano');
+    var pretas = [1, 3, 6, 8, 10];
+    var teclas = [];
+    var brancas = 0, totalBrancas = 15;
+    for (var i = 0; i < 25; i++) {
+      var k = document.createElement('div');
+      if (pretas.indexOf(i % 12) === -1) {
+        k.className = 'k white'; brancas++;
+      } else {
+        k.className = 'k black';
+        var larg = 100 / totalBrancas;
+        k.style.width = (larg * 0.6) + '%';
+        k.style.left = (brancas * larg - larg * 0.3) + '%';
+      }
+      if (i === 12) k.className += ' origin';
+      piano.appendChild(k);
+      teclas.push(k);
+    }
+
+    // Clicar numa tecla muda o tom, igual ao slider
+    teclas.forEach(function (k, i) {
+      k.addEventListener('click', function () {
+        tom.value = i - 12;
+        atualizaTom();
+      });
+    });
+
+    // Tom original da música enviada (0 a 11, ou null enquanto não há música).
+    // Quando o upload existir, o app chama sonnerio.definirTomOriginal('Sol') depois de analisar o áudio:
+    // a tecla do meio passa a ser essa nota e as outras ganham o nome relativo a ela.
+    var NOTAS = ['Dó', 'Dó#', 'Ré', 'Ré#', 'Mi', 'Fá', 'Fá#', 'Sol', 'Sol#', 'Lá', 'Lá#', 'Si'];
+    var original = null;
+    var legendaTom = document.getElementById('legendaTom');
+
+    function nomeDaTecla(i) {
+      return NOTAS[(((original + i - 12) % 12) + 12) % 12];
+    }
+    function definirTomOriginal(nome) {
+      var n = NOTAS.indexOf(nome);
+      original = n === -1 ? null : n;
+      legendaTom.textContent = original === null ? 'tom original' : 'tom original: ' + nome;
+      teclas.forEach(function (k, i) {
+        if (original === null) k.removeAttribute('title'); else k.title = nomeDaTecla(i);
+      });
+      atualizaTom();
+    }
+    window.sonnerio = { definirTomOriginal: definirTomOriginal };
+
+    function atualizaTom() {
+      var v = parseInt(tom.value, 10);
+      var sinal = v > 0 ? '+' + v : String(v);
+      var semitons = sinal + (Math.abs(v) === 1 ? ' semitom' : ' semitons');
+      if (original === null) {
+        tomVal.textContent = v === 0 ? 'Tom original' : semitons;
+      } else {
+        tomVal.textContent = v === 0 ? 'Tom original · ' + nomeDaTecla(12)
+          : nomeDaTecla(12) + ' → ' + nomeDaTecla(12 + v) + ' · ' + semitons;
+      }
+      teclas.forEach(function (k, i) { k.classList.toggle('on', i === 12 + v); });
+    }
+    function atualizaRitmo() {
+      ritmoVal.textContent = ritmo.value + '%';
+      mostraTempo();
+    }
+    tom.addEventListener('input', atualizaTom);
+    ritmo.addEventListener('input', atualizaRitmo);
+
+    var botoes = document.querySelectorAll('.toggle button');
+    botoes.forEach(function (b) {
+      b.addEventListener('click', function () {
+        botoes.forEach(function (o) { o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); });
+      });
+    });
+
+    var hint = document.getElementById('hint');
+    document.getElementById('upload').addEventListener('click', function () {
+      hint.textContent = 'O envio de músicas ficará disponível em breve!';
+    });
+
+    // Player de exemplo: só a barrinha anda, nenhum som é tocado
+    var track = document.getElementById('track');
+    var loopZone = document.getElementById('loopZone');
+    var loopBtn = document.getElementById('loopBtn');
+    var playBtn = document.getElementById('play');
+    var timeEl = document.getElementById('time');
+    var DURACAO = 30, loopA = 0.35, loopB = 0.62, LOOP_MIN = 0.05;
+    var rnd = semente(21);
+    var barras = [];
+    for (var j = 0; j < 90; j++) {
+      var b = document.createElement('div');
+      b.className = 'bar';
+      var frase = 0.5 + 0.5 * Math.sin(j * 0.13 + 1);
+      var h = 14 + (rnd() * 0.55 + 0.45 * frase) * 86;
+      b.style.height = h + '%';
+      track.insertBefore(b, loopZone);
+      barras.push(b);
+    }
+    var handleA = document.getElementById('handleA');
+    var handleB = document.getElementById('handleB');
+    function desenhaLoop() {
+      loopZone.style.left = (loopA * 100) + '%';
+      loopZone.style.width = ((loopB - loopA) * 100) + '%';
+      handleA.setAttribute('aria-valuenow', Math.round(loopA * 100));
+      handleB.setAttribute('aria-valuenow', Math.round(loopB * 100));
+    }
+    // mexer numa alça: A nunca passa de B, e o trecho tem um tamanho mínimo
+    function moveAlca(ehA, frac) {
+      frac = Math.max(0, Math.min(1, frac));
+      if (ehA) loopA = Math.min(frac, loopB - LOOP_MIN);
+      else loopB = Math.max(frac, loopA + LOOP_MIN);
+      desenhaLoop();
+      if (looping && (pos < loopA || pos > loopB)) { pos = loopA; mostraTempo(); }
+    }
+    [handleA, handleB].forEach(function (h) {
+      var ehA = h === handleA;
+      h.addEventListener('pointerdown', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        h.setPointerCapture(e.pointerId); h.focus();
+      });
+      h.addEventListener('pointermove', function (e) {
+        if (!h.hasPointerCapture(e.pointerId)) return;
+        var r = track.getBoundingClientRect();
+        moveAlca(ehA, (e.clientX - r.left) / r.width);
+      });
+      h.addEventListener('click', function (e) { e.stopPropagation(); });
+      h.addEventListener('keydown', function (e) {
+        var passo = e.key === 'ArrowLeft' ? -0.01 : e.key === 'ArrowRight' ? 0.01 : 0;
+        if (!passo) return;
+        e.preventDefault();
+        moveAlca(ehA, (ehA ? loopA : loopB) + passo);
+      });
+    });
+
+    var pos = 0, tocando = false, ultimo = 0, looping = false;
+    function fmt(s) { s = Math.floor(s); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+    function mostraTempo() {
+      var total = DURACAO * 100 / ritmo.value;
+      timeEl.textContent = fmt(pos * total) + ' / ' + fmt(total);
+      var feitas = Math.round(pos * barras.length);
+      barras.forEach(function (b, i) { b.classList.toggle('done', i < feitas); });
+    }
+    function passo(t) {
+      if (!tocando) return;
+      var dt = (t - ultimo) / 1000; ultimo = t;
+      var total = DURACAO * 100 / ritmo.value;
+      pos += dt / total;
+      if (looping && pos >= loopB) pos = loopA;
+      if (pos >= 1) { pos = 0; parar(); }
+      mostraTempo();
+      if (tocando) requestAnimationFrame(passo);
+    }
+    function parar() { tocando = false; playBtn.classList.remove('playing'); playBtn.setAttribute('aria-label', 'Tocar exemplo'); }
+    playBtn.addEventListener('click', function () {
+      if (tocando) { parar(); return; }
+      tocando = true; ultimo = performance.now();
+      playBtn.classList.add('playing'); playBtn.setAttribute('aria-label', 'Pausar exemplo');
+      requestAnimationFrame(passo);
+    });
+    loopBtn.addEventListener('click', function () {
+      looping = !looping;
+      loopBtn.setAttribute('aria-pressed', looping ? 'true' : 'false');
+      track.classList.toggle('looping', looping);
+      if (looping && (pos < loopA || pos > loopB)) { pos = loopA; mostraTempo(); }
+    });
+    desenhaLoop();
+    track.addEventListener('click', function (e) {
+      var r = track.getBoundingClientRect();
+      pos = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+      mostraTempo();
+    });
+
+    atualizaTom(); atualizaRitmo();
+  })();
+
+  // Seções aparecem aos poucos ao rolar a página
+  (function () {
+    document.querySelectorAll('h2, .section-sub').forEach(function (el) { el.classList.add('reveal'); });
+    var itens = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) {
+      itens.forEach(function (el) { el.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entradas) {
+      var fila = 0;
+      entradas.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var el = e.target;
+        io.unobserve(el);
+        // cards e passos que entram juntos aparecem um depois do outro
+        setTimeout(function () { el.classList.add('in'); }, fila++ * 110);
+      });
+    }, { threshold: 0.12 });
+    itens.forEach(function (el) { io.observe(el); });
+  })();
+</script>
+</body>
+</html>
